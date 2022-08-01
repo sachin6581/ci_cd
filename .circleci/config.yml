@@ -27,7 +27,7 @@ workflows:
 jobs:
   build:
     docker:
-      - image: gradle:alpine
+      - image: openjdk:8-jdk-alpine
     steps:
       - checkout
       - run: ./gradlew bootJar
@@ -35,6 +35,7 @@ jobs:
           root: ./
           paths:
             - build/
+            - .gradle/
       - slack/notify:
           channel: team-c
           event: fail
@@ -46,7 +47,7 @@ jobs:
 
   test:
     docker:
-      - image: gradle:alpine
+      - image: openjdk:8-jdk-alpine
     steps:
       - checkout
       - run: ./gradlew test
