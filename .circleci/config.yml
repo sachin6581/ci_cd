@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  slack: circleci/slack@4.1
+
 
 workflows:
   version: 2
@@ -13,6 +16,13 @@ workflows:
       - deploy:
           requires:
             - package
+      - hold:
+          type: approval
+          requires:
+            - deploy
+      - deployToProd:
+          requires:
+            - hold
 
 jobs:
   build:
@@ -25,6 +35,14 @@ jobs:
           root: ./
           paths:
             - build/
+      - slack/notify:
+          channel: team-c
+          event: fail
+          template: basic_fail_1
+      - slack/notify:
+          channel: team-c
+          event: pass
+          template: success_tagged_deploy_1
 
   test:
     docker:
@@ -64,4 +82,18 @@ jobs:
       - run:
           name: "Deploy container"
           command: |
-            curl -X PATCH https://api.heroku.com/apps/$HEROKU_APP_NAME/formation --header "Content-Type: application/json" --header "Accept: application/vnd.heroku+json; version=3.docker-releases" --header "Authorization: Bearer ${HEROKU_TOKEN}" --data '{ "updates": [ { "type": "web", "docker_image": "'$(cat image.txt)'" } ] }'
+            curl -X PATCH https://api.heroku.com/apps/$HEROKU_DEV_APP_NAME/formation --header "Content-Type: application/json" --header "Accept: application/vnd.heroku+json; version=3.docker-releases" --header "Authorization: Bearer ${HEROKU_TOKEN}" --data '{ "updates": [ { "type": "web", "docker_image": "'$(cat image.txt)'" } ] }'
+
+  deployToProd:
+    docker:
+      - image: docker:dind
+    steps:
+      - setup_remote_docker:
+          version: 19.03.13
+      - attach_workspace:
+          at: ./
+      - run: apk add --no-cache curl
+      - run:
+          name: "Deploy container"
+          command: |
+            curl -X PATCH https://api.heroku.com/apps/$HEROKU_PROD_APP_NAME/formation --header "Content-Type: application/json" --header "Accept: application/vnd.heroku+json; version=3.docker-releases" --header "Authorization: Bearer ${HEROKU_TOKEN}" --data '{ "updates": [ { "type": "web", "docker_image": "'$(cat image.txt)'" } ] }'

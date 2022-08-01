@@ -15,7 +15,7 @@ public class CidemoApplication {
 
 	@GetMapping(value = "/")
 	public String getWelcomeMessage(){
-		return "First CI/CD demo with second build";
+		return "Hello World!";
 	}
 
 
