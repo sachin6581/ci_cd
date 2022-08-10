@@ -57,8 +57,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: ./
-      - run: apk add --no-cache curl
-      - run: apk add --no-cache jq httpie
       - run: docker build --iidfile image.txt -t registry.heroku.com/$HEROKU_APP_NAME/web:${CIRCLE_SHA1} .
       - run: docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com
       - run: docker push registry.heroku.com/$HEROKU_APP_NAME/web:${CIRCLE_SHA1}
@@ -76,7 +74,6 @@ jobs:
       - attach_workspace:
           at: ./
       - run: apk add --no-cache curl
-      - run: apk add --no-cache jq httpie
       - run:
           name: "Deploy container"
           command: |
@@ -91,7 +88,6 @@ jobs:
       - attach_workspace:
           at: ./
       - run: apk add --no-cache curl
-      - run: apk add --no-cache jq httpie
       - run:
           name: "Deploy container"
           command: |
