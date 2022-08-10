@@ -88,8 +88,6 @@ jobs:
       - attach_workspace:
           at: ./
       - run: apk add --no-cache curl
-      - run: docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com
-      - run: docker push registry.heroku.com/$HEROKU_PROD_APP_NAME/web:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: ./
           paths:
