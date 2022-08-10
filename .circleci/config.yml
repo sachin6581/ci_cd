@@ -20,10 +20,6 @@ workflows:
           type: approval
           requires:
             - deploy
-        - persist_to_workspace:
-              root: ./
-              paths:
-                - image.txt
       - deployToProd:
           requires:
             - hold
@@ -64,6 +60,19 @@ jobs:
       - run: docker build --iidfile image.txt -t registry.heroku.com/$HEROKU_APP_NAME/web:${CIRCLE_SHA1} .
       - run: docker login --username=_ --password=$HEROKU_TOKEN registry.heroku.com
       - run: docker push registry.heroku.com/$HEROKU_APP_NAME/web:${CIRCLE_SHA1}
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - image.txt
+
+  hold:
+    docker:
+      - image: docker:dind
+    steps:
+      - setup_remote_docker:
+          version: 19.03.13
+      - attach_workspace:
+          at: ./
       - persist_to_workspace:
           root: ./
           paths:
