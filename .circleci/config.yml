@@ -20,7 +20,7 @@ workflows:
           type: approval
           requires:
             - deploy
-          - persist_to_workspace:
+        - persist_to_workspace:
               root: ./
               paths:
                 - image.txt
