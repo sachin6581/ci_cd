@@ -88,6 +88,7 @@ jobs:
     steps:
       - setup_remote_docker:
           version: 19.03.13
+      - checkout
       - attach_workspace:
           at: ./
       - run: apk add --no-cache curl
